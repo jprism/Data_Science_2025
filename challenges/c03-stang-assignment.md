@@ -153,44 +153,31 @@ value for `names_to`.
 df_stang_long <-
   df_stang %>%
     pivot_longer(
-        names_to = c("var", "angle"),
-        names_sep = "_",
-        values_to = "val",
-        starts_with("E") | starts_with("nu")
-      ) %>%
-      pivot_wider(
-        names_from = var, # Cell entries to turn into new column names
-        values_from = val # Values to associate with the new column(s)
-      )
-```
-
-    ## Warning: Values from `val` are not uniquely identified; output will contain list-cols.
-    ## • Use `values_fn = list` to suppress this warning.
-    ## • Use `values_fn = {summary_fun}` to summarise duplicates.
-    ## • Use the following dplyr code to identify duplicates.
-    ##   {data} |>
-    ##   dplyr::summarise(n = dplyr::n(), .by = c(thick, alloy, angle, var)) |>
-    ##   dplyr::filter(n > 1L)
-
-``` r
+      cols = starts_with("E") | starts_with("nu"),  # Selects the right columns
+      names_to = c(".value", "angle"),              # Keeps "E" and "nu" separate
+      names_sep = "_"                               # Splits based on "_"
+    ) 
+df_stang_long <- 
+  df_stang_long %>%
+    filter(E >= 0, nu >= 0) %>%
+    mutate(angle = as.integer(angle))
 df_stang_long
 ```
 
-    ## # A tibble: 12 × 5
-    ##    thick alloy   angle E         nu       
-    ##    <dbl> <chr>   <chr> <list>    <list>   
-    ##  1 0.022 al_24st 00    <dbl [2]> <dbl [2]>
-    ##  2 0.022 al_24st 45    <dbl [2]> <dbl [2]>
-    ##  3 0.022 al_24st 90    <dbl [2]> <dbl [2]>
-    ##  4 0.032 al_24st 00    <dbl [2]> <dbl [2]>
-    ##  5 0.032 al_24st 45    <dbl [2]> <dbl [2]>
-    ##  6 0.032 al_24st 90    <dbl [2]> <dbl [2]>
-    ##  7 0.064 al_24st 00    <dbl [2]> <dbl [2]>
-    ##  8 0.064 al_24st 45    <dbl [2]> <dbl [2]>
-    ##  9 0.064 al_24st 90    <dbl [2]> <dbl [2]>
-    ## 10 0.081 al_24st 00    <dbl [3]> <dbl [3]>
-    ## 11 0.081 al_24st 45    <dbl [3]> <dbl [3]>
-    ## 12 0.081 al_24st 90    <dbl [3]> <dbl [3]>
+    ## # A tibble: 26 × 5
+    ##    thick alloy   angle     E    nu
+    ##    <dbl> <chr>   <int> <dbl> <dbl>
+    ##  1 0.022 al_24st     0 10600 0.321
+    ##  2 0.022 al_24st    45 10700 0.329
+    ##  3 0.022 al_24st    90 10500 0.31 
+    ##  4 0.022 al_24st     0 10600 0.323
+    ##  5 0.022 al_24st    45 10500 0.331
+    ##  6 0.022 al_24st    90 10700 0.323
+    ##  7 0.032 al_24st     0 10400 0.329
+    ##  8 0.032 al_24st    45 10400 0.318
+    ##  9 0.032 al_24st    90 10300 0.322
+    ## 10 0.032 al_24st     0 10300 0.319
+    ## # ℹ 16 more rows
 
 Use the following tests to check your work.
 
@@ -209,12 +196,21 @@ assertthat::assert_that(
 
 ``` r
 ## Dimensions
-##assertthat::assert_that(all(dim(df_stang_long) == c(26, 5)))
-## Type
-##assertthat::assert_that(
-##              (df_stang_long %>% pull(angle) %>% typeof()) == "integer"
-##            )
+assertthat::assert_that(all(dim(df_stang_long) == c(26, 5)))
+```
 
+    ## [1] TRUE
+
+``` r
+## Type
+assertthat::assert_that(
+              (df_stang_long %>% pull(angle) %>% typeof()) == "integer"
+            )
+```
+
+    ## [1] TRUE
+
+``` r
 print("Very good!")
 ```
 
@@ -232,7 +228,23 @@ print("Very good!")
 
 ``` r
 ##
+summary(df_stang_long)
 ```
+
+    ##      thick            alloy               angle          E        
+    ##  Min.   :0.02200   Length:26          Min.   : 0   Min.   : 9900  
+    ##  1st Qu.:0.03200   Class :character   1st Qu.: 0   1st Qu.:10025  
+    ##  Median :0.06400   Mode  :character   Median :45   Median :10400  
+    ##  Mean   :0.05215                      Mean   :45   Mean   :10335  
+    ##  3rd Qu.:0.08100                      3rd Qu.:90   3rd Qu.:10500  
+    ##  Max.   :0.08100                      Max.   :90   Max.   :10700  
+    ##        nu        
+    ##  Min.   :0.3100  
+    ##  1st Qu.:0.3152  
+    ##  Median :0.3215  
+    ##  Mean   :0.3212  
+    ##  3rd Qu.:0.3277  
+    ##  Max.   :0.3310
 
 **Observations**:
 
@@ -249,7 +261,7 @@ print("Very good!")
   - 0, 45, 90 degrees
 - What thicknesses were tested?
   - 4 thicknesses where tested. .022, .032, .064,.081
-- (Write your own question here)
+- How does angle impact the youngs modulus or nu of the aluminum?
 
 ## Visualize
 
@@ -259,11 +271,37 @@ print("Very good!")
 
 ``` r
 ## TASK: Investigate your question from q1 here
+df_stang_long %>%
+
+  ggplot(aes(angle, E, color = as_factor(thick))) +
+  geom_point(size = 3) +
+  theme_minimal()
 ```
+
+![](c03-stang-assignment_files/figure-gfm/q3-task-1.png)<!-- -->
+
+``` r
+df_stang_long %>%
+
+  ggplot(aes(angle, nu, color = as_factor(thick))) +
+  geom_point(size = 3) +
+  theme_minimal()
+```
+
+![](c03-stang-assignment_files/figure-gfm/q3-task-2.png)<!-- -->
 
 **Observations**:
 
-- (Address your question from q1 here)
+- While more data would be helpful these graphs show that angle has
+  little to no impact on the E or nu of aluminum
+  - In comparison thickness / the specific plate being sampled seem to
+    have a much larger impact
+- This matches what I would expect to see considering that aluminum
+  (like most metals) is generally treated as an isotropic material
+  (meaning that it shows the same material properties in all directions)
+  this is in comparison to a material like wood which is anisotropic.
+  Would has more shear strength against the grain, but is easily split
+  with a shear force against the grain.
 
 ### **q4** Consider the following statement:
 
@@ -278,19 +316,40 @@ Is this evidence *conclusive* one way or another? Why or why not?
 
 ``` r
 ## NOTE: No need to change; run this chunk
-##df_stang_long %>%
-##
-###  ggplot(aes(nu, E, color = as_factor(thick))) +
-##  geom_point(size = 3) +
-##  theme_minimal()
+df_stang_long %>%
+
+  ggplot(aes(nu, E, color = as_factor(thick))) +
+  geom_point(size = 3) +
+  theme_minimal()
 ```
+
+![](c03-stang-assignment_files/figure-gfm/q4-vis-1.png)<!-- -->
 
 **Observations**:
 
 - Does this graph support or contradict the claim above?
-  - (Your response here)
+  - It does support the claim that the amount of material effects the
+    material properties. .081 has the lowest E and nu by a significant
+    margin.
+  - Additionally the other three all take up slightly different places
+    on the graph.
+  - E shows more clear variance than nu with different thicknesses
+    - They’re oddly out of order compared with their thickness when
+      looking at E
+      - This contradicts there being some sort of direct relationship
 - Is this evidence *conclusive* one way or another?
-  - (Your response here)
+  - Not at all. At most this data was collected from 8 pieces of
+    aluminum which is completely statistically insignificant. For with
+    so many complex manufacturing variables you’d need a far larger
+    sample size
+  - Its likely that all of the aluminum in this experiment came from the
+    same source.
+    - The manufacturer likely has different machinery for casting,
+      extruding, or forming the different sized plates of aluminum
+      - some difference in this process could easily explain the
+        variability seen
+  - Width and height of the plates is unmentioned in the dataset. There
+    could be a huge variance in this variable for all that we know.
 
 # References
 

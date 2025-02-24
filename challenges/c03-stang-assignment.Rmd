@@ -73,16 +73,16 @@ Note that these data are not tidy! The data in this form are convenient for repo
 df_stang_long <-
   df_stang %>%
     pivot_longer(
-        names_to = c("var", "angle"),
-        names_sep = "_",
-        values_to = "val",
-        starts_with("E") | starts_with("nu")
-      ) %>%
-      pivot_wider(
-        names_from = var, # Cell entries to turn into new column names
-        values_from = val # Values to associate with the new column(s)
-      )
+      cols = starts_with("E") | starts_with("nu"),  # Selects the right columns
+      names_to = c(".value", "angle"),              # Keeps "E" and "nu" separate
+      names_sep = "_"                               # Splits based on "_"
+    ) 
+df_stang_long <- 
+  df_stang_long %>%
+    filter(E >= 0, nu >= 0) %>%
+    mutate(angle = as.integer(angle))
 df_stang_long
+
 ```
 
 Use the following tests to check your work.
@@ -97,11 +97,11 @@ assertthat::assert_that(
               )
             )
 ## Dimensions
-##assertthat::assert_that(all(dim(df_stang_long) == c(26, 5)))
+assertthat::assert_that(all(dim(df_stang_long) == c(26, 5)))
 ## Type
-##assertthat::assert_that(
-##              (df_stang_long %>% pull(angle) %>% typeof()) == "integer"
-##            )
+assertthat::assert_that(
+              (df_stang_long %>% pull(angle) %>% typeof()) == "integer"
+            )
 
 print("Very good!")
 ```
@@ -118,6 +118,7 @@ print("Very good!")
 
 ```{r q2-task}
 ##
+summary(df_stang_long)
 ```
 
 **Observations**:
@@ -130,7 +131,7 @@ print("Very good!")
     -   0, 45, 90 degrees
 -   What thicknesses were tested?
     -   4 thicknesses where tested. .022, .032, .064,.081
--   (Write your own question here)
+-   How does angle impact the youngs modulus or nu of the aluminum?
 
 ## Visualize
 
@@ -140,11 +141,23 @@ print("Very good!")
 
 ```{r q3-task}
 ## TASK: Investigate your question from q1 here
+df_stang_long %>%
+
+  ggplot(aes(angle, E, color = as_factor(thick))) +
+  geom_point(size = 3) +
+  theme_minimal()
+df_stang_long %>%
+
+  ggplot(aes(angle, nu, color = as_factor(thick))) +
+  geom_point(size = 3) +
+  theme_minimal()
 ```
 
 **Observations**:
 
--   (Address your question from q1 here)
+-   While more data would be helpful these graphs show that angle has little to no impact on the E or nu of aluminum
+    -   In comparison thickness / the specific plate being sampled seem to have a much larger impact
+-   This matches what I would expect to see considering that aluminum (like most metals) is generally treated as an isotropic material (meaning that it shows the same material properties in all directions) this is in comparison to a material like wood which is anisotropic. Would has more shear strength against the grain, but is easily split with a shear force against the grain.
 
 ### **q4** Consider the following statement:
 
@@ -154,19 +167,27 @@ Note that the "amount of material" would vary with the thickness of a tested pla
 
 ```{r q4-vis}
 ## NOTE: No need to change; run this chunk
-##df_stang_long %>%
-##
-###  ggplot(aes(nu, E, color = as_factor(thick))) +
-##  geom_point(size = 3) +
-##  theme_minimal()
+df_stang_long %>%
+
+  ggplot(aes(nu, E, color = as_factor(thick))) +
+  geom_point(size = 3) +
+  theme_minimal()
 ```
 
 **Observations**:
 
 -   Does this graph support or contradict the claim above?
-    -   (Your response here)
+    -   It does support the claim that the amount of material effects the material properties. .081 has the lowest E and nu by a significant margin.
+    -   Additionally the other three all take up slightly different places on the graph.
+    -   E shows more clear variance than nu with different thicknesses
+        -   They're oddly out of order compared with their thickness when looking at E
+            -   This contradicts there being some sort of direct relationship
 -   Is this evidence *conclusive* one way or another?
-    -   (Your response here)
+    -   Not at all. At most this data was collected from 8 pieces of aluminum which is completely statistically insignificant. For with so many complex manufacturing variables you'd need a far larger sample size
+    -   Its likely that all of the aluminum in this experiment came from the same source.
+        -   The manufacturer likely has different machinery for casting, extruding, or forming the different sized plates of aluminum
+            -   some difference in this process could easily explain the variability seen
+    -   Width and height of the plates is unmentioned in the dataset. There could be a huge variance in this variable for all that we know.
 
 # References
 
