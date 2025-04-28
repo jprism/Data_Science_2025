@@ -12,17 +12,20 @@ prerequisites:
 *Purpose*: Learning to do EDA well takes practice! In this challenge you'll further practice EDA by first completing a guided exploration, then by conducting your own investigation. This challenge will also give you a chance to use the wide variety of visual tools we've been learning.
 
 <!-- include-rubric -->
+
 # Grading Rubric
+
 <!-- -------------------------------------------------- -->
 
 Unlike exercises, **challenges will be graded**. The following rubrics define how you will be graded, both on an individual and team basis.
 
 ## Individual
+
 <!-- ------------------------- -->
 
 | Category | Needs Improvement | Satisfactory |
-|----------|----------------|--------------|
-| Effort | Some task __q__'s left unattempted | All task __q__'s attempted |
+|----|----|----|
+| Effort | Some task **q**'s left unattempted | All task **q**'s attempted |
 | Observed | Did not document observations, or observations incorrect | Documented correct observations based on analysis |
 | Supported | Some observations not clearly supported by analysis | All observations clearly supported by analysis (table, graph, etc.) |
 | Assessed | Observations include claims not supported by the data, or reflect a level of certainty not warranted by the data | Observations are appropriately qualified by the quality & relevance of the data and (in)conclusiveness of the support |
@@ -30,10 +33,10 @@ Unlike exercises, **challenges will be graded**. The following rubrics define ho
 | Code Styled | Violations of the [style guide](https://style.tidyverse.org/) hinder readability | Code sufficiently close to the [style guide](https://style.tidyverse.org/) |
 
 ## Submission
+
 <!-- ------------------------- -->
 
 Make sure to commit both the challenge report (`report.md` file) and supporting files (`report_files/` folder) when you are done! Then submit a link to Canvas. **Your Challenge submission is not complete without all files uploaded to GitHub.**
-
 
 ```{r setup}
 library(tidyverse)
@@ -41,36 +44,45 @@ library(gapminder)
 
 ```
 
-*Background*: [Gapminder](https://www.gapminder.org/about-gapminder/) is an
-independent organization that seeks to educate people about the state of the
-world. They seek to counteract the worldview constructed by a hype-driven media
-cycle, and promote a "fact-based worldview" by focusing on data. The dataset
-we'll study in this challenge is from Gapminder.
+*Background*: [Gapminder](https://www.gapminder.org/about-gapminder/) is an independent organization that seeks to educate people about the state of the world. They seek to counteract the worldview constructed by a hype-driven media cycle, and promote a "fact-based worldview" by focusing on data. The dataset we'll study in this challenge is from Gapminder.
 
 # Guided EDA
+
 <!-- -------------------------------------------------- -->
 
 First, we'll go through a round of *guided EDA*. Try to pay attention to the high-level process we're going through---after this guided round you'll be responsible for doing another cycle of EDA on your own!
 
-### __q0__ Perform your "first checks" on the dataset. What variables are in this
+### **q0** Perform your "first checks" on the dataset. What variables are in this
+
 dataset?
 
 ```{r q0-task}
 ## TASK: Do your "first checks" here!
+##glimpse(gapminder)
+head(gapminder)
+summary(gapminder)
 ```
 
 **Observations**:
 
-- Write all variable names here
+-   Country, Continent, Year, Life expectancy, Population
 
-### __q1__ Determine the most and least recent years in the `gapminder` dataset.
+### **q1** Determine the most and least recent years in the `gapminder` dataset.
 
 *Hint*: Use the `pull()` function to get a vector out of a tibble. (Rather than the `$` notation of base R.)
 
 ```{r q1-task}
 ## TASK: Find the largest and smallest values of `year` in `gapminder`
-year_max <- NA_real_
-year_min <- NA_real_
+year_max <- 
+    gapminder %>%
+      pull(year) %>%
+        max()
+year_min <- gapminder %>%
+      pull(year) %>%
+        min()
+
+print(year_max)
+print(year_min)
 ```
 
 Use the following test to check your work.
@@ -90,32 +102,69 @@ if (is_tibble(year_max)) {
 print("Nice!")
 ```
 
-### __q2__ Filter on years matching `year_min`, and make a plot of the GDP per capita against continent. Choose an appropriate `geom_` to visualize the data. What observations can you make?
+### **q2** Filter on years matching `year_min`, and make a plot of the GDP per capita against continent. Choose an appropriate `geom_` to visualize the data. What observations can you make?
 
 You may encounter difficulties in visualizing these data; if so document your challenges and attempt to produce the most informative visual you can.
 
 ```{r q2-task}
 ## TASK: Create a visual of gdpPercap vs continent
+year_min_data <-
+  filter(gapminder,year==1952)
+print(year_min_data)
+year_min_data %>%
+  ggplot(aes(continent, gdpPercap)) +
+    geom_point(size = 2, alpha = .2) +
+    theme_minimal() + 
+    scale_y_continuous(trans='log10')
+  
 ```
 
 **Observations**:
 
-- Write your observations here
+-   Americas and europe have the highest max GDPs
+-   Africa has the lowest average GDP
+-   Asia has a very high outlier
+-   Europe has a pretty consistent tight set of data but theres an strong outlier on both the high and low ends\
 
 **Difficulties & Approaches**:
 
-- Write your challenges and your approach to solving them
+-   The outlier in Asia makes it very different to distinguish the rest of the data since its such a higher value than anything else. Plus theres a significant number of countries with almost no GDP
+    -   Used a log scale to make the data more readable
+-   Overlapping points makes it difficult to estimate the density of the data
+    -   set alpha to .2
 
-### __q3__ You should have found *at least* three outliers in q2 (but possibly many more!). Identify those outliers (figure out which countries they are).
+### **q3** You should have found *at least* three outliers in q2 (but possibly many more!). Identify those outliers (figure out which countries they are).
 
 ```{r q3-task}
 ## TASK: Identify the outliers from q2
+##Outlier 1, asia
+Asia_outlier <-
+  gapminder %>%
+    filter(year==1952) %>%
+      filter(continent=="Asia") %>%
+        arrange(desc(gdpPercap))
+print(Asia_outlier)
+##outlier 2/3 europe
+Asia_outlier <-
+  gapminder %>%
+    filter(year==1952) %>%
+      filter(continent=="Europe") %>%
+        arrange((gdpPercap))
+print(Asia_outlier)
+Asia_outlier <-
+  gapminder %>%
+    filter(year==1952) %>%
+      filter(continent=="Europe") %>%
+        arrange(desc(gdpPercap))
+print(Asia_outlier)
 ```
 
 **Observations**:
 
-- Identify the outlier countries from q2
-  - (Your response here)
+-   Identify the outlier countries from q2
+    -   High Outlier in Asia is Kuwait
+    -   High in Europe is Switzerland
+    -   Low in Europe is Bosnia
 
 *Hint*: For the next task, it's helpful to know a ggplot trick we'll learn in an upcoming exercise: You can use the `data` argument inside any `geom_*` to modify the data that will be plotted *by that geom only*. For instance, you can use this trick to filter a set of points to label:
 
@@ -133,41 +182,175 @@ gapminder %>%
   )
 ```
 
-### __q4__ Create a plot similar to yours from q2 studying both `year_min` and `year_max`. Find a way to highlight the outliers from q3 on your plot *in a way that lets you identify which country is which*. Compare the patterns between `year_min` and `year_max`.
+### **q4** Create a plot similar to yours from q2 studying both `year_min` and `year_max`. Find a way to highlight the outliers from q3 on your plot *in a way that lets you identify which country is which*. Compare the patterns between `year_min` and `year_max`.
 
 *Hint*: We've learned a lot of different ways to show multiple variables; think about using different aesthetics or facets.
 
 ```{r q4-task}
 ## TASK: Create a visual of gdpPercap vs continent
+year_min_max_data <-
+  filter(gapminder, year==max(year) | year==min(year))
+print(year_min_max_data)
+year_min_max_data %>%
+  ggplot(aes(continent, gdpPercap)) +
+    geom_point(size = 2, alpha = .2, mapping=aes(color=factor(year))) +
+    theme_minimal() + 
+    scale_y_continuous(trans='log10')+
+    geom_point(
+      data = . %>% filter(country %in% c("Kuwait", "Switzerland", "Bosnia and Herzegovina")),
+      mapping = aes(color = factor(year),shape=country),
+      size = 4
+  )+
+    scale_shape_manual(values = c("Kuwait" = 2, "Switzerland" = 3, "Bosnia and Herzegovina" = 4 ))
+  
 ```
 
 **Observations**:
 
-- Write your observations here
+-   Kuwait has remained as the highest GDP in asia as well as one of the highest in the whole world but is no longer a nearly as significant of an outlier
+-   Switzerland has lost its lead on europe and and while still near the top is no longer the highest or an outlier in the same way
+-   Bosnia remains near the bottom of europe but has risen in GDP with the rest of the rejoin as is no longer the lowest GDP in the region.
 
 # Your Own EDA
+
 <!-- -------------------------------------------------- -->
 
 Now it's your turn! We just went through guided EDA considering the GDP per capita at two time points. You can continue looking at outliers, consider different years, repeat the exercise with `lifeExp`, consider the relationship between variables, or something else entirely.
 
-### __q5__ Create *at least* three new figures below. With each figure, try to pose new questions about the data.
+### **q5** Create *at least* three new figures below. With each figure, try to pose new questions about the data.
 
 ```{r q5-task1}
 ## TASK: Your first graph
+data_summary <- gapminder %>%
+  group_by(country,continent) %>%
+  summarize(
+    avg_lifeExp = mean(lifeExp, na.rm = TRUE),
+    avg_pop = mean(pop, na.rm = TRUE),
+    avg_gdpPercap = mean(gdpPercap, na.rm = TRUE),
+    .groups = "drop"  # optional: ungroup the result
+  )
+data_summary <-
+  data_summary %>%
+    mutate(percent_gdp=100*(avg_gdpPercap/(sum(avg_gdpPercap))))
+print(data_summary)
+data_summary %>%
+  ggplot(aes(avg_gdpPercap)) +
+      geom_histogram(bins=50) +
+      theme_minimal()
+      #scale_y_continuous(trans='log10')
+data_summary %>%
+  filter(avg_gdpPercap<30000) %>%
+    ggplot(aes(avg_gdpPercap)) +
+      geom_histogram(bins=100) +
+      theme_minimal()
+data_summary %>%
+  ggplot(aes(avg_gdpPercap,percent_gdp,color=continent)) +
+      geom_col() +
+      theme_minimal()
+      #scale_x_continuous(trans='log10')
+data_summary %>%
+  ggplot(aes(avg_gdpPercap,percent_gdp,color=continent)) +
+      geom_col() +
+      theme_minimal() +
+      scale_x_continuous(trans='log10')
+
 ```
 
-- (Your notes and observations here)
+-   Question:
+    -   Distribution of average GDPs over the timespan
+-   This graph shows the inequity in our economic systems. There are far more countries with very low GDPs than there are countries in the middle of the gdp range. The non log graph shows even more strongly how some countries control far more money than many poorer countries put together.
+-   This inspired my next set off graphs that look at percentage of overall GDP global based on average gdp
+    -   the largest gdp country in Asia controls the largest percent of global gdp at over 6 percent, meanwhile many of the countries in Asia have an almost immeasurable percentage of global gdp
+    -   in Europe many countries have between 2-3 percent of global gdp
+    -   logically, this graph shows a directly linear relationship
 
 ```{r q5-task2}
 ## TASK: Your second graph
+data_summary %>%
+  ggplot(aes(avg_pop,avg_gdpPercap, color=continent)) +
+      geom_point() +
+      theme_minimal() + 
+      scale_x_continuous(trans='log10')
+data_summary %>%
+  ggplot(aes(avg_pop,avg_gdpPercap, color=continent)) +
+      geom_col() +
+      theme_minimal() + 
+      scale_x_continuous(trans='log10')
 ```
 
-- (Your notes and observations here)
+-   (Your notes and observations here)
+-   Question: How does population effect GDP?
+    -   Highest populations are in Asia
+    -   Both very high population and very low population seems to lead to a lower average GDP
+    -   In general there doesn't seem to be a strong correlation between avg population and avg gdp
 
 ```{r q5-task3}
 ## TASK: Your third graph
+# 1. Calculate the average GDP per country (across all years). Averaging first so that a country can't change categories over the course of time
+country_gdp_avg <- 
+  gapminder %>%
+    group_by(country) %>%
+    summarise(
+      avg_gdpPercap = mean(gdpPercap, na.rm = TRUE),
+      .groups = "drop"
+    )
+
+# 2. Bin countries based on their average GDP
+country_gdp_avg <- 
+  country_gdp_avg %>%
+    mutate(
+      gdp_bin = cut(
+        avg_gdpPercap,
+        breaks = quantile(avg_gdpPercap, probs = seq(0, 1, by = 0.2), na.rm = TRUE),
+        include.lowest = TRUE,
+        labels = c("Very Low", "Low", "Medium", "High", "Very High")
+      )
+    )
+
+# 3. Merge the GDP bin info back into the full dataset
+df_with_bins <- 
+  gapminder %>%
+    left_join(country_gdp_avg %>% select(country, gdp_bin), by = "country")
+
+# 4. Group by year and gdp_bin, then average other values
+df_summary <- 
+  df_with_bins %>%
+    group_by(year, gdp_bin, continent) %>%
+    summarise(
+      avg_lifeExp = mean(lifeExp, na.rm = TRUE),
+      avg_pop = mean(pop, na.rm = TRUE),
+      avg_gdpPercap = mean(gdpPercap, na.rm = TRUE),
+      .groups = "drop"
+    )
+print(df_with_bins)
+print(df_summary)
+
+df_summary  %>%
+  ggplot(aes(year,avg_pop, color=gdp_bin)) +
+      geom_line() +
+      theme_minimal() +
+      facet_wrap(~continent) +
+      scale_y_continuous(trans='log10')
+df_with_bins %>%
+  ggplot(aes(year,pop, color=gdp_bin,group=country)) +
+    geom_line() +
+    theme_minimal() +
+    facet_grid(continent~gdp_bin) +
+    scale_y_continuous(trans='log10') +
+    theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+
 ```
 
-- (Your notes and observations here)
-
-
+-   How does average GDP range of a country effect population growth of that country over time, and is it effected by region?
+    -   **Cool thing**
+        -   At first I binned the entire dataset, however this messed up my graphs as some countries moved between bins overtime so instead I averaged the countries gdp first before sorting it into a bin
+    -   I used a log scale to make population changes more apparent
+    -   Africa saw the most consistent steady population growth across gdp bins, with gdp having little effect on population growth.
+    -   Europes population growth is relatively flat for high and very high gdps, but there is significant growth for medium gpd countries
+    -   High gdp in asia has a higher growth than very high gdp
+-   I was worried that individual countries was throwing of the results I was seeing in the bins so I also made a facet_grid that plots lines for all the countries at once over time, still visualized by gdp bin, but not averaged
+    -   This gave a much more detailed view into the data
+        -   For example two of the 3 countries in the medium gdp bin for europe had significant growth, but the third did not
+        -   Some high income countries in Asia are have very large population changes while most are relatively flat over time
+        -   Medium income countries in the Americas follow a very consistent curve over time across countries with limited variance.\
