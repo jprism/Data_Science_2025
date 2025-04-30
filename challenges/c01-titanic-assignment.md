@@ -151,8 +151,8 @@ df_titanic %>% summarize(total = sum(n))
 ``` r
 ## TASK: Visualize counts against `Class` and `Sex`
 df_titanic %>%
-  ggplot(aes(x = Sex, y=n, fill = Class)) +
-  geom_col(position = "dodge")+
+  ggplot(aes(x = Sex, y = n, fill = Class)) +
+  geom_col(position = "dodge") +
   facet_wrap(~Survived)
 ```
 
@@ -164,7 +164,8 @@ df_titanic %>%
   almost all of the people that died were male
 - The largest surviving group was male crew
 - Many of the people who died were crew
-- 1st class females were the least likely to die
+- 1st class females had the smallest probability of dying out of all of
+  the groups present on the titanic.
 - of females the most who died where 3rd class
 - despite more crew overall seeming to die compared to 3rd class. female
   crew almost all survived while many 3rd class females died
@@ -215,9 +216,15 @@ df_prop
 
 ``` r
 df_prop%>%
-  ggplot(aes(x = Sex, y=Prop, fill = Class)) +
-  geom_col(position = "dodge")+
-  facet_wrap(~Survived)
+  ggplot(aes(x = Sex, y = Prop, fill = Class, color=Age)) +
+  geom_col(position = "dodge") +
+  facet_wrap(~Survived) +
+  scale_color_manual(
+    values = c(
+      "Adult" = "black",
+      "Child" = "red"
+    )
+  )
 ```
 
     ## Warning: Removed 4 rows containing missing values or values outside the scale range
@@ -245,8 +252,8 @@ additional variables!
 
 ``` r
 df_prop%>%
-  ggplot(aes(x = Sex, y=Prop, fill = Class)) +
-  geom_col(position = "dodge")+
+  ggplot(aes(x = Sex, y = Prop, fill = Class)) +
+  geom_col(position = "dodge") +
   facet_grid(Age~Survived)
 ```
 

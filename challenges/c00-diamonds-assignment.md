@@ -97,15 +97,14 @@ document your observations.
 
 ``` r
 ## TASK: Plot `price` vs `carat` below
-ggplot(            # 1. Starting a ggplot
-  data = diamonds  # 2. Dataset to visualize
-) +                # 3. Adding elements to the plot
-  geom_point(      # 4. Geometry
-    mapping = aes( # 5. `Aes`thetic mapping
-      x = carat,   # 5.1. Mapping the `x` variable
-      y = price    # 5.2. Mapping the `y` variable
+diamonds %>%
+  ggplot() +                
+    geom_point(     
+      mapping = aes( 
+        x = carat,   
+        y = price
+      )
     )
-  )
 ```
 
 ![](c00-diamonds-assignment_files/figure-gfm/q1-task-1.png)<!-- -->
@@ -115,20 +114,23 @@ ggplot(            # 1. Starting a ggplot
 - The price increases significantly with the carat
 - There’s less datapoints for high carat diamonds
 - there’s a lot of price variance in the 1-3 carat range
-- 0-1 carat diamonds are always cheap
+- 0-1 carat diamonds generally fall in the 100-7500 dollar range while
+  diamonds above 1 carat fall in the 2500-18000 dollar range
 
 ### **q2** Create a visualization showing variables `carat`, `price`, and `cut` simultaneously. Experiment with which variable you assign to which aesthetic (`x`, `y`, etc.) to find an effective visual.
 
 ``` r
 ## TASK: Plot `price`, `carat`, and `cut` below
-ggplot(diamonds) +
-          # 3. Adding elements to the plot
-  geom_point(      # 4. Geometry
-    mapping = aes( # 5. `Aes`thetic mapping
-      x = carat,   # 5.1. Mapping the `x` variable
-      y = price,    # 5.2. Mapping the `y` variable
-      alpha=cut
-      ))
+diamonds %>%
+  ggplot() +                
+    geom_point(     
+      mapping = aes( 
+        x = carat,   
+        y = price,
+        color=cut,
+        alpha=.2
+      )
+    )
 ```
 
 ![](c00-diamonds-assignment_files/figure-gfm/q2-task-1.png)<!-- -->
@@ -137,7 +139,11 @@ ggplot(diamonds) +
 
 - Some of the most expensive diamonds have a less than perfect cut. Many
   of the cheapest lowest quality diamonds have an ideal cut. Price seems
-  more effected by carat then by cut.
+  more effected by carat then by cut. Lower quality cuts tend to
+  congreagate around signifiant carat numbers like 1, 1.5 or 2. Better
+  cuts seem to be more distributed throughout the carat range, this may
+  be because you want to preserve as much weight as possible on a higher
+  quality cut.
 
 # Communication
 

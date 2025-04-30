@@ -152,15 +152,14 @@ value for `names_to`.
 ## TASK: Tidy `df_stang`
 df_stang_long <-
   df_stang %>%
-    pivot_longer(
-      cols = starts_with("E") | starts_with("nu"),  # Selects the right columns
-      names_to = c(".value", "angle"),              # Keeps "E" and "nu" separate
-      names_sep = "_"                               # Splits based on "_"
-    ) 
-df_stang_long <- 
-  df_stang_long %>%
-    filter(E >= 0, nu >= 0) %>%
-    mutate(angle = as.integer(angle))
+  pivot_longer(
+    cols = starts_with("E") | starts_with("nu"),  # Selects the right columns
+    names_to = c(".value", "angle"),              # Keeps "E" and "nu" separate
+    names_sep = "_"                               # Splits based on "_"
+  ) %>%
+  filter(E >= 0, nu >= 0) %>%
+  mutate(angle = as.integer(angle))
+
 df_stang_long
 ```
 
@@ -246,15 +245,50 @@ summary(df_stang_long)
     ##  3rd Qu.:0.3277  
     ##  Max.   :0.3310
 
+``` r
+df_stang_long %>%
+  distinct(alloy)
+```
+
+    ## # A tibble: 1 × 1
+    ##   alloy  
+    ##   <chr>  
+    ## 1 al_24st
+
+``` r
+df_stang_long %>%
+  distinct(angle)
+```
+
+    ## # A tibble: 3 × 1
+    ##   angle
+    ##   <int>
+    ## 1     0
+    ## 2    45
+    ## 3    90
+
+``` r
+df_stang_long %>%
+  distinct(thick)
+```
+
+    ## # A tibble: 4 × 1
+    ##   thick
+    ##   <dbl>
+    ## 1 0.022
+    ## 2 0.032
+    ## 3 0.064
+    ## 4 0.081
+
+  
+
 **Observations**:
 
 - Is there “one true value” for the material properties of Aluminum?
   - No, it varies based on the the variability in the manufacturing
-    process of the material. Therefore all materials have average
-    properties with confidence intervals and variability based on
-    significant testing. This is very important in the aerospace
-    industry and is important to consider for all load critical
-    components.
+    process of the material. We can conduct a confidence interval for
+    mean based on sampling. This is very important in the aerospace
+    industry and is important to consider for all l
 - How many aluminum alloys are in this dataset? How do you know?
   - (Your response here)
 - What angles were tested?
@@ -292,8 +326,9 @@ df_stang_long %>%
 
 **Observations**:
 
-- While more data would be helpful these graphs show that angle has
-  little to no impact on the E or nu of aluminum
+- While more data on a higher number of samples and angles would be
+  helpful to be confident in the results these graphs show that angle
+  has little to no impact on the E or nu of aluminum
   - In comparison thickness / the specific plate being sampled seem to
     have a much larger impact
 - This matches what I would expect to see considering that aluminum
@@ -328,9 +363,9 @@ df_stang_long %>%
 **Observations**:
 
 - Does this graph support or contradict the claim above?
-  - It does support the claim that the amount of material effects the
-    material properties. .081 has the lowest E and nu by a significant
-    margin.
+  - It contradicts the claim that the amount of material does not effect
+    the material properties. .081 has the lowest E and nu by a
+    significant margin.
   - Additionally the other three all take up slightly different places
     on the graph.
   - E shows more clear variance than nu with different thicknesses
@@ -341,7 +376,9 @@ df_stang_long %>%
   - Not at all. At most this data was collected from 8 pieces of
     aluminum which is completely statistically insignificant. For with
     so many complex manufacturing variables you’d need a far larger
-    sample size
+    sample size specifically one that sources metal from a variety of
+    different manufacturers to avoid bias due to metal having all been
+    created in the same batch.
   - Its likely that all of the aluminum in this experiment came from the
     same source.
     - The manufacturer likely has different machinery for casting,

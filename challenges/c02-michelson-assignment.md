@@ -143,10 +143,10 @@ df_michelson %>% glimpse()
 df_q1 <- 
   df_michelson %>%
     group_by(Distinctness) %>%
-      summarise(
-        n=sum(n()),
-        MeanVelocity=mean(Velocity)
-      )
+    summarise(
+      n=sum(n()),
+      MeanVelocity=mean(Velocity)
+    )
 df_q1 %>%
   arrange(desc(Distinctness)) %>%
   knitr::kable()
@@ -161,7 +161,7 @@ df_q1 %>%
 **Observations**: - Write your observations here! - The mean velocity
 values are different - Why might your table differ from Michelson’s? -
 Looks like Michelson’s table rounded to the 10’s digit but mine rounded
-to the 1’s digit
+to the .1’s digit
 
 The `Velocity` values in the dataset are the speed of light *in air*;
 Michelson introduced a couple of adjustments to estimate the speed of
@@ -387,8 +387,11 @@ df_q2%>%
   - lowest values at the low end
   - 72 or so has the most variance
 - Distinctness:
-  - Higher distinctness has a higher mean. Lower distinctness has less
+  - Higher distinctness has a higher median. Lower distinctness has less
     variance
+  - a distinctness of 2 has 2 outliers while 1 only has 1 and 3 has zero
+  - 1 has the lowest quartile value, and 3 has the highest quartile
+    value
 - Date:
   - Readings decreased on average with time
   - most data was taken around june 20th
