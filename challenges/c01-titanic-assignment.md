@@ -215,8 +215,8 @@ df_prop
 ### **q4** Replicate your visual from q3, but display `Prop` in place of `n`. Document your observations, and note any new/different observations you make in comparison with q3. Is there anything *fishy* in your plot?
 
 ``` r
-df_prop%>%
-  ggplot(aes(x = Sex, y = Prop, fill = Class, color=Age)) +
+df_prop %>%
+  ggplot(aes(x = Sex, y = Prop, fill = Class, color = Age)) +
   geom_col(position = "dodge") +
   facet_wrap(~Survived) +
   scale_color_manual(
@@ -237,7 +237,7 @@ df_prop%>%
 - despite having the highest number of survivors male crew actually have
   the lowest proportion of survival
 - Female crew have one of the highest proportions of survival in
-  comparison
+  comparison to other groups
 - 1st class woman have almost no deaths
 - Is there anything *fishy* going on in your plot?
   - We haven’t seperated by age, so this allows for totals that are over
@@ -251,7 +251,7 @@ df_prop%>%
 additional variables!
 
 ``` r
-df_prop%>%
+df_prop %>%
   ggplot(aes(x = Sex, y = Prop, fill = Class)) +
   geom_col(position = "dodge") +
   facet_grid(Age~Survived)
